@@ -11,17 +11,30 @@ module.exports = gql`
 
 
 input CreateEmployeeInput{
-    first_name: String
-    last_name: String
-    email: String
-    gender: String
-    salary: Number
+    first_name: String!
+    last_name: String!
+    email: String!
+    gender: String!
+    salary: Number!
+},
+
+input EditEmployeeInput{
+    first_name: String!
+    last_name: String!
+    email: String!
+    gender: String!
+    salary: Number!
 },
 
 type Query {
-    employee(id: String!): Employee!
-
+    employee(email: String!): Employee!
+    getEmployees: [Employee]!
 }
 
+type Mutation {
+    createEmployee(input: CreateEmployeeInput!): Employee!
+    updateEmployee(email: String!, input: EditEmployeeInput!): Employee!
+    deleteEmployee(email: String!): Employee!
+}
 
 `;
