@@ -1,9 +1,16 @@
 const express = require('express');
 const app = express();
-const port = 3000;
+const SERVER_PORT = 3000
 const userData = require('./MOCK_DATA.json');
 const { graphqlHTTP } = require('express-graphql');
 const { GraphQLSchema, GraphQLObjectType, GraphQLString, GraphQLInt, GraphQLList } = require('graphql');
+
+mongoose.connect("mongodb+srv://qlows:ananinamizuck@cluster0.hm9ineu.mongodb.net/employee_backend?retryWrites=true&w=majority",
+    {
+        useUnifiedTopology: true,
+        useNewUrlParser: true
+    }
+)
 
 const userType = new GraphQLObjectType({
     name: 'User',
@@ -40,6 +47,7 @@ app.use("/graphql", graphqlHTTP({
     graphiql: true
 }));
 
-app.listen(port, () => {
-    console.log(`Example app listening at http://localhost:${port}`)
+// Start the server
+app.listen(SERVER_PORT, () => {
+    console.log(`Server running at http://localhost:${SERVER_PORT}`)
 })
