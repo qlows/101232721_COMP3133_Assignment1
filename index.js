@@ -1,18 +1,36 @@
-const express = require('express');
-const app = express();
+const { ApolloServer } = require('apollo-server');
+const mongoose = require('mongoose');
+
+//const express = require('express');
+//const userData = require('./MOCK_DATA.json');
+//const { graphqlHTTP } = require('express-graphql');
+//const { GraphQLSchema, GraphQLObjectType, GraphQLString, GraphQLInt, GraphQLList } = require('graphql');
+//const app = express();
+
+// Start the server and connect to MongoDB
 const SERVER_PORT = 3000
-const userData = require('./MOCK_DATA.json');
-const { graphqlHTTP } = require('express-graphql');
-const { GraphQLSchema, GraphQLObjectType, GraphQLString, GraphQLInt, GraphQLList } = require('graphql');
+const MONGODB = "mongodb+srv://qlows:ananinamizuck@cluster0.hm9ineu.mongodb.net/employee_backend?retryWrites=true&w=majority"
+mongoose.connect(MONGODB, { useUnifiedTopology: true, useNewUrlParser: true })
+    .then(() => {
+        console.log("Connected to MongoDB");
+        return server.listen({ port: SERVER_PORT });
+    })
+    .then((res) => {
+        console.log(`Server running at ${res.url}`);
+    })
+    .catch((err) => {
+        console.log(err, "Couldn't connect to MongoDB");
+    });
 
-mongoose.connect("mongodb+srv://qlows:ananinamizuck@cluster0.hm9ineu.mongodb.net/employee_backend?retryWrites=true&w=majority",
-    {
-        useUnifiedTopology: true,
-        useNewUrlParser: true
-    }
-)
+const typeDefs = require("./router/typeDefs");
+const resolvers = require("./router/resolvers");
 
-const userType = new GraphQLObjectType({
+const server = new ApolloServer({
+    typeDefs,
+    resolvers
+});
+
+/* const userType = new GraphQLObjectType({
     name: 'User',
     fields: () => ({
         //id: { type: GraphQLInt },
@@ -40,14 +58,10 @@ const Mutation = "mutation"
 
 const schema = new GraphQLSchema({
     query: RootQuery, mutation: Mutation
-})
+}) 
 
 app.use("/graphql", graphqlHTTP({
     schema: schema,
     graphiql: true
 }));
-
-// Start the server
-app.listen(SERVER_PORT, () => {
-    console.log(`Server running at http://localhost:${SERVER_PORT}`)
-})
+*/
