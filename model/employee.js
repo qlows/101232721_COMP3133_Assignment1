@@ -12,10 +12,12 @@ const employeeSchema = new Schema({
     email: {
         type: String,
         required: [true, "Enter email address"],
+        unique: true,
     },
     gender: {
         type: String,
         required: [true, "Enter gender"],
+        enum: ["male", "female", "other"],
     },
     salary: {
         type: Number,
