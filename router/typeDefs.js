@@ -12,7 +12,7 @@ module.exports = gql`
    type User {
        username: String!
        email: String!
-       password: password!
+       password: String!
    }
      type AuthPayload {
        token: String!
@@ -51,6 +51,7 @@ module.exports = gql`
        createEmployee(input: CreateEmployeeInput!): Employee!
        updateEmployee(id: ID!, input: EmployeeUpdateInput!): Employee
        deleteEmployee(ID: ID!): Employee!
+       createUser(username: String!, email: String!, password: String!): User
        signUp(input: SignUpInput!): AuthPayload!
        signIn(input: SignInInput!): AuthPayload!
    }
