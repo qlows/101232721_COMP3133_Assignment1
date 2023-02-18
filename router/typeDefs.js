@@ -1,4 +1,4 @@
-const {gql} = require('apollo-server');
+const { gql } = require('apollo-server');
 
 module.exports = gql`
     type Employee {
@@ -8,8 +8,7 @@ module.exports = gql`
         gender: String!
         salary: Float!
     }
-
-
+    
 input CreateEmployeeInput{
     first_name: String!
     last_name: String!
