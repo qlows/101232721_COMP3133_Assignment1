@@ -1,4 +1,6 @@
 const Employee = require('../model/employee');
+const User = require('../model/user');
+const jwt = require('jsonwebtoken');
 
 module.exports = {
     Query: {
@@ -25,6 +27,12 @@ module.exports = {
                 };
             }
         },
+        async User(parent, args, context, info) {
+            if (!context.user) {
+                throw new Error('Authentication required.');
+            }
+            return context.user;
+        }
     },
 
     Mutation: {
@@ -58,6 +66,30 @@ module.exports = {
             }
         },
 
-        // Mutation for 
+        // Mutation for signing up a new user
+        signUp: async (parent, { input }, context) => {
+            const { username, email, password } = input;
+            const existingUser = await User.findOne({ email });
+            if (existingUser) {
+                throw new Error('User already exists.');
+            }
+            const user = new User({ username, email, password });
+            await user.save();
+            const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
+            return { token };
+        },
+        signIn: async (parent, { input }, context) => {
+            const { username, password } = input;
+            const user = await User.findOne({ username });
+            if (!user) {
+                throw new Error('Invalid username or password.');
+            }
+            const isMatch = await user.comparePassword(password);
+            if (!isMatch) {
+                throw new Error('Invalid username or password.');
+            }
+            const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
+            return { token };
+        }
     }
-}
+};
