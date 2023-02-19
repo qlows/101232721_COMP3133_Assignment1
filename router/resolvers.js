@@ -1,6 +1,7 @@
-const Employee = require('../model/employee');
-const User = require('../model/user');
-const jwt = require('jsonwebtoken');
+const Employee = require("../model/employee");
+const User = require("../model/user");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
 
 module.exports = {
     Query: {
@@ -29,7 +30,7 @@ module.exports = {
         },
         async User(parent, args, context, info) {
             if (!context.user) {
-                throw new Error('Authentication required.');
+                throw new Error("Authentication required.");
             }
             return context.user;
         }
@@ -67,29 +68,37 @@ module.exports = {
         },
 
         // Mutation for signing up a new user
-        signUp: async (parent, { input }, context) => {
-            const { username, email, password } = input;
+        async createUser(_, { username, email, password }) {
             const existingUser = await User.findOne({ email });
             if (existingUser) {
-                throw new Error('User already exists.');
+                throw new Error("User already exists.");
             }
-            const user = new User({ username, email, password });
+            const hashedPassword = await bcrypt.hash(password, 10);
+            const user = new User({ username, email, password: hashedPassword });
             await user.save();
-            const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
-            return { token };
+            return user;
         },
-        signIn: async (parent, { input }, context) => {
+
+        // Mutation for signing in a user
+        async signIn(parent, { input }, { models }) {
             const { username, password } = input;
-            const user = await User.findOne({ username });
+          
+            const user = await models.User.findOne({ where: { username } });
+          
             if (!user) {
-                throw new Error('Invalid username or password.');
+              throw new Error("Invalid login credentials");
             }
-            const isMatch = await user.comparePassword(password);
-            if (!isMatch) {
-                throw new Error('Invalid username or password.');
+          
+            const passwordMatch = await bcrypt.compare(password, user.password);
+          
+            if (!passwordMatch) {
+              throw new Error("Invalid login credentials");
             }
-            const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET);
-            return { token };
-        }
-    }
+          
+            return {
+              success: true,
+              message: "Login successful",
+            };
+          },
+    },
 };

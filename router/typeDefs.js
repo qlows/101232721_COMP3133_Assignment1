@@ -1,5 +1,7 @@
-const { gql } = require('apollo-server');
-const jwt = require('jsonwebtoken');
+const { gql } = require("apollo-server");
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+
 
 module.exports = gql`
    type Employee {
@@ -10,14 +12,6 @@ module.exports = gql`
        salary: Float!
    }
    type User {
-       username: String!
-       email: String!
-       password: String!
-   }
-     type AuthPayload {
-       token: String!
-   }
-     input SignUpInput {
        username: String!
        email: String!
        password: String!
@@ -52,9 +46,14 @@ module.exports = gql`
        updateEmployee(id: ID!, input: EmployeeUpdateInput!): Employee
        deleteEmployee(ID: ID!): Employee!
        createUser(username: String!, email: String!, password: String!): User
-       signUp(input: SignUpInput!): AuthPayload!
-       signIn(input: SignInInput!): AuthPayload!
+       signIn(input: SignInInput!): SuccessResponse!
    }
+
+   type SuccessResponse {
+    success: Boolean!
+    message: String
+    }
+
    input EmployeeUpdateInput {
        first_name: String
        last_name: String
@@ -62,4 +61,12 @@ module.exports = gql`
        gender: String
        salary: Float
    }
+
+   extend type Query {
+    me: User
+  }
+  
+  extend type Mutation {
+    signUp(username: String!, email: String!, password: String!): SuccessResponse!
+  }
 `;
