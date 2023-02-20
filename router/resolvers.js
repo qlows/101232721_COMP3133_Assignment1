@@ -80,25 +80,18 @@ module.exports = {
         },
 
         // Mutation for signing in a user
-        async signIn(parent, { input }, { models }) {
-            const { username, password } = input;
-          
-            const user = await models.User.findOne({ where: { username } });
-          
+        signIn: async (_, { input }) => {
+            const { email, password } = input;
+            const user = await User.findOne({ email });
             if (!user) {
-              throw new Error("Invalid login credentials");
+              return { success: false, message: "Invalid credentials" };
             }
-          
-            const passwordMatch = await bcrypt.compare(password, user.password);
-          
-            if (!passwordMatch) {
-              throw new Error("Invalid login credentials");
+            const isPasswordValid = await bcrypt.compare(password, user.password);
+            if (!isPasswordValid) {
+              return { success: false, message: "Invalid credentials" };
             }
-          
-            return {
-              success: true,
-              message: "Login successful",
-            };
-          },
+            return { success: true, message: "User authenticated successfully" };
+          }
+        
     },
 };
