@@ -1,5 +1,6 @@
 const { ApolloServer } = require('apollo-server');
 const mongoose = require('mongoose');
+const User = require('./model/user');
 
 const typeDefs = require("./router/typeDefs");
 const resolvers = require("./router/resolvers");
